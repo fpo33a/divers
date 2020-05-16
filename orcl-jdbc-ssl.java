@@ -31,7 +31,7 @@ Output result:
 
 url = jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=mydbserver)(PORT=1501))(CONNECT_DATA=(SERVICE_NAME=myservice)))
 
-Thin :exa22-scan2.swift.corp:1501/wdwdev_ssl.swift.com: Connected with user test
+Thin :mydbservice:1501/mydev_ssl.swift.com: Connected with user test
 
 select sys_context('USERENV','NETWORK_PROTOCOL') as protocol from dual
 
