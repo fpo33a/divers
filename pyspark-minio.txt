@@ -1,0 +1,94 @@
+
+C:\frank\spark-3.2.0-bin-hadoop3.2>dir /s *aws*
+ Volume in drive C is Windows-SSD
+ Volume Serial Number is 6E96-F985
+
+ Directory of C:\frank\spark-3.2.0-bin-hadoop3.2\jars
+
+22/01/2022  19:49        98.732.349 aws-java-sdk-bundle-1.11.375.jar
+22/01/2022  19:49           480.674 hadoop-aws-3.2.0.jar
+               2 File(s)     99.213.023 bytes
+
+---------- local tests ------------
+
+C:\frank\minio>mc alias set s3 http://127.0.0.1:9000 test Abcd1234
+Added `s3` successfully.
+
+C:\frank\minio>mc  ls
+[2021-07-24 14:34:39 CEST]    98B client.txt
+[2021-07-24 14:02:29 CEST]     0B data\
+[2021-07-24 14:13:33 CEST]  21MiB mc.exe
+[2021-07-24 13:51:01 CEST]  90MiB minio.exe
+[2021-07-24 14:01:07 CEST]   171B run.bat
+
+C:\frank\minio>
+
+C:\frank\minio>mc cp client.txt s3/bucket1
+client.txt:
+
+C:\frank\minio>mc ls s3/bucket1
+[2021-07-24 14:42:38 CEST]   355B client.txt
+
+C:\frank\minio>mc cat s3/bucket1
+mc: <ERROR> Unable to read from `s3/bucket1`. Object name cannot be empty.
+
+C:\frank\minio>mc cat s3/bucket1/client.txt
+
+  C:\frank\minio>mc alias set s3 http://127.0.0.1:9000 test Abcd1234
+  Added `s3` successfully.
+
+  C:\frank\minio>mc  ls
+  [2021-07-24 14:34:39 CEST]    98B client.txt
+  [2021-07-24 14:02:29 CEST]     0B data\
+  [2021-07-24 14:13:33 CEST]  21MiB mc.exe
+  [2021-07-24 13:51:01 CEST]  90MiB minio.exe
+  [2021-07-24 14:01:07 CEST]   171B run.bat
+
+C:\frank\minio>
+C:\frank\minio>
+C:\frank\minio>notepad test.txt
+   this is a test for minio
+C:\frank\minio>mc cp test.txt s3/bucket1
+test.txt:
+C:\frank\minio>mc ls s3/bucket1
+[2021-07-24 14:42:38 CEST]   355B client.txt
+[2021-07-24 14:46:02 CEST]    24B test.txt
+
+C:\frank\minio>del test.txt
+
+C:\frank\minio>mc cat s3/bucket1/test.txt
+this is a test for minio
+C:\frank\minio>
+
+
+
+spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.access.key','test')
+spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.secret.key','Abcd1234')
+spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.path.style.access','true')
+spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.impl','org.apache.hadoop.fs.s3a.S3AFileSystem')
+spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.endpoint','http://localhost:9000')
+spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.connection.ssl.enabled','false')
+spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
+
+df = spark.read.text ('s3a://bucket1/test.txt')
+df.show ()
+
+
+>>> spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.access.key','test')
+>>> spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.secret.key','Abcd1234')
+>>> spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.path.style.access','true')
+>>> spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.impl','org.apache.hadoop.fs.s3a.S3AFileSystem')
+>>> spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.endpoint','http://localhost:9000')
+>>> spark.sparkContext._jsc.hadoopConfiguration().set('fs.s3a.connection.ssl.enabled','false')
+>>> spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
+>>>
+>>> df = spark.read.text ('s3a://bucket1/test.txt')
+22/01/22 20:07:23 WARN MetricsConfig: Cannot locate configuration: tried hadoop-metrics2-s3a-file-system.properties,hadoop-metrics2.properties
+>>> df.show ()
++--------------------+
+|               value|
++--------------------+
+|this is a test fo...|
++--------------------+
+
+>>>
